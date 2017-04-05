@@ -109,4 +109,12 @@
     <!-- Strings related to Notification preference -->
     <string name="pref_last_notification">last_notification</string>
 
+    <!-- Empty Weather Database -->
+    <string name="empty_forecast_list">No Weather Information Available</string>
+    <string name="empty_forecast_list_disconnected">No Weather Information Available - Network is Disconnected</string>
+    <string name="empty_forecast_list_disconnecting">No Weather Information Available - Network is Currently Disconnecting</string>
+    <string name="empty_forecast_list_suspended">No Weather Information Available - Network Suspended</string>
+    <string name="empty_forecast_list_connecting">No Weather Information Available - Network is Currently Connecting</string>
+    <string name="empty_forecast_list_unknown">No Weather Information Available - Unknown Network Error</string>
+
 </resources>
