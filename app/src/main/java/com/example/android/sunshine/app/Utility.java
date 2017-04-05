@@ -39,6 +39,13 @@ public class Utility {
                 SunshineSyncAdapter.LOCATION_STATUS_UNKNOWN);
     }
 
+    public static void setLocationStatus (Context context, @SunshineSyncAdapter.LocationStatus int status) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor writablePrefs = prefs.edit();
+        writablePrefs.putInt(context.getString(R.string.pref_location_status), status);
+        writablePrefs.apply();
+    }
+
     public static boolean isMetric(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getString(context.getString(R.string.pref_units_key),

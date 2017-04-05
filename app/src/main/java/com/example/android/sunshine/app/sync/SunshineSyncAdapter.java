@@ -51,13 +51,15 @@ import java.util.Vector;
 public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({LOCATION_STATUS_OK, LOCATION_STATUS_SERVER_DOWN, LOCATION_STATUS_SERVER_INVALID, LOCATION_STATUS_UNKNOWN})
+    @IntDef({LOCATION_STATUS_OK, LOCATION_STATUS_SERVER_DOWN, LOCATION_STATUS_SERVER_INVALID,
+            LOCATION_STATUS_UNKNOWN, LOCATION_STATUS_INVALID})
     public @interface LocationStatus {}
 
     public static final int LOCATION_STATUS_OK = 0;
     public static final int LOCATION_STATUS_SERVER_DOWN = 1;
     public static final int LOCATION_STATUS_SERVER_INVALID = 2;
     public static final int LOCATION_STATUS_UNKNOWN = 3;
+    public static final int LOCATION_STATUS_INVALID = 4;
 
     public final String LOG_TAG = SunshineSyncAdapter.class.getSimpleName();
     // Interval at which to sync with the weather, in seconds.
@@ -223,10 +225,33 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
         final String OWM_WEATHER = "weather";
         final String OWM_DESCRIPTION = "main";
         final String OWM_WEATHER_ID = "id";
+        final String OWM_MESSAGE_CODE = "cod";
+
+        final int OWM_MESSAGE_ERROR = 404;
+        final int OWM_MESSAGE_OK = 200;
 
         try {
             JSONObject forecastJson = new JSONObject(forecastJsonStr);
             JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
+
+            if (forecastJson.has(OWM_MESSAGE_CODE)) {
+                int errorCode = forecastJson.getInt(OWM_MESSAGE_CODE);
+                switch (errorCode) {
+                    case OWM_MESSAGE_ERROR:
+                        setLocationStatus(getContext(), SunshineSyncAdapter.LOCATION_STATUS_INVALID);
+                        Log.e(LOG_TAG, "Got error from server in returned JSON!");
+                        return;
+                    case OWM_MESSAGE_OK:
+                        setLocationStatus(getContext(), SunshineSyncAdapter.LOCATION_STATUS_OK);
+                        Log.d(LOG_TAG, "Got NO error from server in returned JSON!");
+                        break;
+
+                    default:
+                        setLocationStatus(getContext(), SunshineSyncAdapter.LOCATION_STATUS_SERVER_DOWN);
+                        Log.e(LOG_TAG, "Got error from server in returned JSON!");
+                        return;
+                }
+            }
 
             JSONObject cityJson = forecastJson.getJSONObject(OWM_CITY);
             String cityName = cityJson.getString(OWM_CITY_NAME);
